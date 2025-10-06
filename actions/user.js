@@ -16,53 +16,101 @@ export async function updateUser(data) {
   if (!user) throw new Error("User not found");
 
   try {
-    // Start a transaction to handle both operations
-    const result = await db.$transaction(
-      async (tx) => {
-        // First check if industry exists
-        let industryInsight = await tx.industryInsight.findUnique({
-          where: {
-            industry: data.industry,
-          },
-        });
+    // 🔹 Check if industry insights already exist
+    let industryInsight = await db.industryInsight.findUnique({
+      where: { industry: data.industry },
+    });
 
-        // If industry doesn't exist, create it with default values
-        if (!industryInsight) {
-          const insights = await generateAIInsights(data.industry);
-
-          industryInsight = await db.industryInsight.create({
-            data: {
-              industry: data.industry,
-              ...insights,
-              nextUpdate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-            },
-          });
-        }
-
-        // Now update the user
-        const updatedUser = await tx.user.update({
-          where: {
-            id: user.id,
-          },
-          data: {
-            industry: data.industry,
-            experience: data.experience,
-            bio: data.bio,
-            skills: data.skills,
-          },
-        });
-
-        return { updatedUser, industryInsight };
-      },
-      {
-        timeout: 10000, // default: 5000
+    // 🔹 If not, generate and safely insert insights
+    if (!industryInsight) {
+      let insights = null;
+      try {
+        insights = await generateAIInsights(data.industry);
+      } catch (err) {
+        console.error("❌ AI generation failed:", err);
       }
-    );
+
+      // ✅ Fallback if AI fails or returns invalid data
+      if (!insights || typeof insights !== "object") {
+        console.warn("⚠️ Using fallback insights for", data.industry);
+        insights = {
+          salaryRanges: [],
+          growthRate: 0,
+          demandLevel: "Medium",
+          topSkills: [],
+          marketOutlook: "Neutral",
+          keyTrends: [],
+          recommendedSkills: [],
+        };
+      }
+
+      // ✅ Sanitize data before saving to DB
+      const safeInsights = {
+        salaryRanges: Array.isArray(insights.salaryRanges)
+          ? insights.salaryRanges
+          : [],
+        growthRate:
+          typeof insights.growthRate === "number" ? insights.growthRate : 0,
+        demandLevel:
+          typeof insights.demandLevel === "string"
+            ? insights.demandLevel
+            : "Medium",
+        topSkills: Array.isArray(insights.topSkills) ? insights.topSkills : [],
+        marketOutlook:
+          typeof insights.marketOutlook === "string"
+            ? insights.marketOutlook
+            : "Neutral",
+        keyTrends: Array.isArray(insights.keyTrends) ? insights.keyTrends : [],
+        recommendedSkills: Array.isArray(insights.recommendedSkills)
+          ? insights.recommendedSkills
+          : [],
+      };
+
+      industryInsight = await db.industryInsight.create({
+        data: {
+          industry: data.industry,
+
+          // ✅ Wrap arrays meant to be JSON documents
+          salaryRanges: safeInsights.salaryRanges, // Json field
+          recommendedSkills: safeInsights.recommendedSkills, // Json field
+
+          // ✅ Plain fields
+          growthRate: safeInsights.growthRate,
+          demandLevel: safeInsights.demandLevel,
+          marketOutlook: safeInsights.marketOutlook,
+
+          // ✅ Simple string arrays
+          topSkills: safeInsights.topSkills,
+          keyTrends: safeInsights.keyTrends,
+
+          nextUpdate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        },
+      });
+    }
+
+    // 🔹 Update user info
+    const updatedUser = await db.user.update({
+      where: { id: user.id },
+      data: {
+        industry: data.industry,
+        experience: data.experience,
+        bio: data.bio,
+        skills: data.skills,
+      },
+    });
 
     revalidatePath("/");
-    return result.user;
+    return updatedUser;
   } catch (error) {
-    console.error("Error updating user and industry:", error.message);
+    const safeError =
+      error && typeof error === "object"
+        ? error
+        : { message: String(error || "Unknown error") };
+
+    console.error(
+      "❌ Error updating user and industry:",
+      safeError.message || safeError
+    );
     throw new Error("Failed to update profile");
   }
 }

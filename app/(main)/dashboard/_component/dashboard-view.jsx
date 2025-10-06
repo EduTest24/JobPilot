@@ -16,6 +16,8 @@ import {
   TrendingUp,
   TrendingDown,
   Brain,
+  Lightbulb,
+  Puzzle,
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import {
@@ -184,43 +186,87 @@ const DashboardView = ({ insights }) => {
         </CardContent>
       </Card>
 
-      {/* Industry Trends */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Key Industry Trends</CardTitle>
-            <CardDescription>
-              Current trends shaping the industry
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-4">
-              {insights.keyTrends.map((trend, index) => (
-                <li key={index} className="flex items-start space-x-2">
-                  <div className="h-2 w-2 mt-2 rounded-full bg-primary" />
-                  <span>{trend}</span>
+{/* 🌐 Industry Insights Section */}
+<div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 items-stretch">
+  {/* --- ✨ Key Industry Trends --- */}
+  <Card className="relative overflow-hidden border border-border/50 shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-b from-background to-muted/30 h-full flex flex-col">
+    <CardHeader className="pb-3 flex-shrink-0">
+      <div className="flex items-center justify-between">
+        <CardTitle className="text-lg font-semibold flex items-center gap-2">
+          <TrendingUp className="text-primary h-5 w-5" />
+          Key Industry Trends
+        </CardTitle>
+      </div>
+      <CardDescription>
+        Current trends shaping the industry
+      </CardDescription>
+    </CardHeader>
+    <CardContent className="flex-grow">
+      <ul className="space-y-4">
+        {insights.keyTrends.map((trend, index) => (
+          <li
+            key={index}
+            className="flex items-start space-x-3 bg-muted/30 rounded-xl p-3 hover:bg-muted/50 transition-all"
+          >
+            <div className="h-2.5 w-2.5 mt-2 rounded-full bg-primary" />
+            <span className="text-sm leading-relaxed">{trend}</span>
+          </li>
+        ))}
+      </ul>
+    </CardContent>
+  </Card>
+
+  {/* --- 🧠 Recommended Skills --- */}
+  <Card className="relative overflow-hidden border border-border/50 shadow-sm hover:shadow-md transition-all duration-300 bg-gradient-to-b from-background to-muted/30 h-full flex flex-col">
+    <CardHeader className="pb-3 flex-shrink-0">
+      <div className="flex items-center justify-between">
+        <CardTitle className="text-lg font-semibold flex items-center gap-2">
+          <Lightbulb className="text-primary h-5 w-5" />
+          Recommended Skills
+        </CardTitle>
+      </div>
+      <CardDescription>
+        Skills to consider developing and where to learn them
+      </CardDescription>
+    </CardHeader>
+    <CardContent className="flex-grow">
+      <div className="space-y-6">
+        {insights.recommendedSkills.map((item, index) => (
+          <div
+            key={index}
+            className="border border-gray-200 dark:border-gray-700 p-4 rounded-xl hover:bg-muted/40 transition-all group"
+          >
+            <h4 className="font-semibold text-lg mb-3 flex items-center gap-2 group-hover:text-primary transition-colors">
+              <Puzzle className="h-5 w-5 text-primary" />
+              {item.skill}
+            </h4>
+
+            <ul className="space-y-2">
+              {item.sources.map((src, i) => (
+                <li
+                  key={i}
+                  className="flex items-center text-sm text-muted-foreground"
+                >
+                  <span className="font-medium text-primary mr-2">
+                    {src.type}:
+                  </span>
+                  <a
+                    href={src.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline text-blue-600 dark:text-blue-400 truncate max-w-[85%]"
+                  >
+                    {src.name}
+                  </a>
                 </li>
               ))}
             </ul>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Recommended Skills</CardTitle>
-            <CardDescription>Skills to consider developing</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {insights.recommendedSkills.map((skill) => (
-                <Badge key={skill} variant="outline">
-                  {skill}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        ))}
       </div>
+    </CardContent>
+  </Card>
+</div>
     </div>
   );
 };

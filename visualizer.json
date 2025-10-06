@@ -1,0 +1,74 @@
+{
+  "id": "cmg9pr7z20000u764px2xrdyb",
+  "industry": "tech-software-development",
+  "salaryRanges": [
+    {
+      "max": 180000,
+      "min": 80000,
+      "role": "Software Engineer",
+      "median": 130000,
+      "location": "USA"
+    },
+    {
+      "max": 200000,
+      "min": 90000,
+      "role": "Data Scientist",
+      "median": 145000,
+      "location": "USA"
+    },
+    {
+      "max": 160000,
+      "min": 70000,
+      "role": "Frontend Developer",
+      "median": 115000,
+      "location": "USA"
+    },
+    {
+      "max": 170000,
+      "min": 75000,
+      "role": "Backend Developer",
+      "median": 122500,
+      "location": "USA"
+    },
+    {
+      "max": 190000,
+      "min": 85000,
+      "role": "Project Manager",
+      "median": 137500,
+      "location": "USA"
+    },
+    {
+      "max": 210000,
+      "min": 95000,
+      "role": "DevOps Engineer",
+      "median": 152500,
+      "location": "USA"
+    }
+  ],
+  "growthRate": 12.5,
+  "demandLevel": "High",
+  "topSkills": [
+    "Cloud Computing",
+    "AI/ML",
+    "Cybersecurity",
+    "Data Analysis",
+    "Full-Stack Development"
+  ],
+  "marketOutlook": "Positive",
+  "keyTrends": [
+    "AI-Powered Development",
+    "Cloud-Native Architecture",
+    "Low-Code/No-Code Platforms",
+    "Cybersecurity Mesh Architecture",
+    "Remote Work Technologies"
+  ],
+  "recommendedSkills": [
+    "Python",
+    "AWS",
+    "JavaScript",
+    "Data Science",
+    "Cybersecurity Fundamentals"
+  ],
+  "lastUpdated": "2025-10-03T10:27:13.339Z",
+  "nextUpdate": "2025-10-10T10:27:13.339Z"
+}
